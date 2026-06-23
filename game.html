@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Pasterflow — Memory Game</title>
+  <meta name="description" content="Pasterflow: a pastel-themed memory card game">
+  <link rel="icon" type="image/x-icon" href="https://cdn.glitch.global/aed1e798-d668-4241-a8a1-4aeb8554c7c2/icon.png?v=1717840429403">
+  <style>
+    :root{
+      --bg1:#ffecd2; --bg2:#fcb69f; --card:#ffffff;
+      --accent:#7b61ff; --muted:#6b6b6b;
+    }
+    *{box-sizing:border-box}
+    body{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,var(--bg1),var(--bg2)); color:#222}
+    .wrap{width:min(980px,94vw); padding:28px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    h1{margin:0;font-size:1.6rem;letter-spacing:0.5px}
+    .controls{display:flex;gap:10px;align-items:center}
+    .btn{background:var(--accent);color:#fff;padding:8px 12px;border-radius:10px;border:0;cursor:pointer;font-weight:600}
+    .btn.ghost{background:transparent;color:var(--accent);border:2px solid rgba(0,0,0,0.06)}
+    .meta{display:flex;gap:12px;align-items:center;color:var(--muted);font-size:0.95rem}
+
+    .board-wrap{margin-top:18px;background:rgba(255,255,255,0.6);padding:18px;border-radius:14px;box-shadow:0 6px 18px rgba(0,0,0,0.08)}
+    .stats{display:flex;gap:18px;align-items:center;margin-bottom:12px}
+    .stat{background:rgba(0,0,0,0.03);padding:8px 12px;border-radius:8px;font-weight:600}
+
+    .board{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    @media (max-width:520px){.board{grid-template-columns:repeat(3,1fr)}}
+
+    .card{position:relative;padding-top:100%;border-radius:10px;cursor:pointer;perspective:800px}
+    .card-inner{position:absolute;inset:0;border-radius:10px;transition:transform 350ms;transform-style:preserve-3d}
+    .card.flipped .card-inner{transform:rotateY(180deg)}
+    .card-face{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;border-radius:10px;backface-visibility:hidden;font-size:2rem}
+    .card-front{background:linear-gradient(135deg,#fff,#f6f6ff);border:2px dashed rgba(0,0,0,0.04)}
+    .card-back{background:var(--card);transform:rotateY(180deg);box-shadow:inset 0 -6px 18px rgba(0,0,0,0.03)}
+
+    .footer{margin-top:14px;text-align:center;color:var(--muted);font-size:0.9rem}
+    a.privacy{color:var(--accent);text-decoration:none;font-weight:600}
+
+    /* Win overlay */
+    .win{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.35);visibility:hidden;opacity:0;transition:opacity 200ms}
+    .win.show{visibility:visible;opacity:1}
+    .win-card{background:#fff;padding:20px;border-radius:12px;text-align:center;min-width:260px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Pasterflow</h1>
+        <div class="meta">A pastel-themed memory matching game</div>
+      </div>
+      <div class="controls">
+        <button class="btn" id="restart">Restart</button>
+        <a class="btn ghost" href="privacy.html">Privacy</a>
+      </div>
+    </header>
+
+    <main class="board-wrap" aria-live="polite">
+      <div class="stats" role="status">
+        <div class="stat">Moves: <span id="moves">0</span></div>
+        <div class="stat">Time: <span id="timer">00:00</span></div>
+        <div class="stat">Pairs: <span id="pairs">0/8</span></div>
+      </div>
+
+      <div class="board" id="board" aria-label="Memory card board"></div>
+      <div class="footer">Flip two cards to find a match. Good luck!</div>
+    </main>
+  </div>
+
+  <div class="win" id="win" role="dialog" aria-modal="true">
+    <div class="win-card">
+      <h2>Well done!</h2>
+      <p>You've completed Pasterflow.</p>
+      <p><strong>Moves:</strong> <span id="win-moves">0</span> • <strong>Time:</strong> <span id="win-time">00:00</span></p>
+      <button class="btn" id="play-again">Play again</button>
+    </div>
+  </div>
+
+  <script>
+    // Simple memory game
+    const EMOJIS = [
+      '🍑','🍓','🍋','🍇','🍉','🍒','🥝','🍍'
+    ]; // 8 pairs
+
+    const board = document.getElementById('board');
+    const movesEl = document.getElementById('moves');
+    const timerEl = document.getElementById('timer');
+    const pairsEl = document.getElementById('pairs');
+    const restartBtn = document.getElementById('restart');
+    const winEl = document.getElementById('win');
+    const winMoves = document.getElementById('win-moves');
+    const winTime = document.getElementById('win-time');
+    const playAgain = document.getElementById('play-again');
+
+    let firstCard = null, secondCard = null, lock=false, moves=0, matches=0;
+    let timer=null, seconds=0, running=false;
+
+    function shuffle(array){
+      for(let i=array.length-1;i>0;i--){
+        const j=Math.floor(Math.random()*(i+1)); [array[i],array[j]]=[array[j],array[i]];
+      }
+      return array;
+    }
+
+    function startTimer(){
+      if(running) return; running=true; seconds=0; timerEl.textContent='00:00';
+      timer = setInterval(()=>{ seconds++; timerEl.textContent=formatTime(seconds); },1000);
+    }
+    function stopTimer(){ running=false; clearInterval(timer); }
+    function formatTime(s){ const m=Math.floor(s/60); const ss=s%60; return String(m).padStart(2,'0')+':' + String(ss).padStart(2,'0'); }
+
+    function buildBoard(){
+      board.innerHTML=''; moves=0; matches=0; updateStats(); stopTimer();
+      const cards = shuffle([...EMOJIS, ...EMOJIS]);
+      cards.forEach((val,i)=>{
+        const card = document.createElement('div'); card.className='card'; card.tabIndex=0; card.setAttribute('data-value',val); card.setAttribute('role','button');
+        card.innerHTML = `<div class="card-inner"><div class="card-face card-front">?</div><div class="card-face card-back">${val}</div></div>`;
+        card.addEventListener('click',()=>onCardClick(card));
+        card.addEventListener('keydown',(e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); onCardClick(card); } });
+        board.appendChild(card);
+      });
+    }
+
+    function onCardClick(card){
+      if(lock || card.classList.contains('flipped')) return;
+      if(!running) startTimer();
+      card.classList.add('flipped');
+      if(!firstCard){ firstCard=card; return; }
+      secondCard=card; lock=true; moves++; updateStats();
+      const a=firstCard.getAttribute('data-value'), b=secondCard.getAttribute('data-value');
+      if(a===b){ matches++; pairsEl.textContent = `${matches}/8`; resetTurn(true); if(matches===EMOJIS.length) onWin(); }
+      else setTimeout(()=>{ firstCard.classList.remove('flipped'); secondCard.classList.remove('flipped'); resetTurn(false); }, 800);
+    }
+
+    function resetTurn(isMatch){ firstCard=null; secondCard=null; lock=false; }
+
+    function updateStats(){ movesEl.textContent = moves; pairsEl.textContent = `${matches}/8`; }
+
+    function onWin(){ stopTimer(); winMoves.textContent = moves; winTime.textContent = formatTime(seconds); winEl.classList.add('show'); winEl.querySelector('button').focus(); }
+
+    restartBtn.addEventListener('click',()=>{ winEl.classList.remove('show'); buildBoard(); });
+    playAgain.addEventListener('click',()=>{ winEl.classList.remove('show'); buildBoard(); });
+
+    // initialize
+    buildBoard();
+  </script>
+</body>
+</html>

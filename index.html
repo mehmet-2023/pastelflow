@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="tr">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>Pasterflow — Hafıza Oyunu</title>
+	<meta name="description" content="Pasterflow: pastel temalı eğlenceli bir hafıza oyunu">
+	<link rel="icon" type="image/x-icon" href="https://cdn.glitch.global/aed1e798-d668-4241-a8a1-4aeb8554c7c2/icon.png?v=1717840429403">
+	<style>
+		:root{--bg1:#fff5f7; --bg2:#fff1f3; --accent:#ff7ab6; --muted:#6b6b6b}
+		*{box-sizing:border-box}
+		body{margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; background:linear-gradient(180deg,var(--bg1),var(--bg2)); color:#232323}
+		.container{max-width:1100px;margin:0 auto;padding:40px 20px}
+		.nav{display:flex;align-items:center;justify-content:space-between}
+		.brand{display:flex;align-items:center;gap:14px}
+		.logo{width:64px;height:64px;display:block}
+		h1{margin:0;font-size:2.2rem}
+		p.lead{color:var(--muted);margin-top:6px}
+
+		.hero{display:flex;gap:28px;align-items:center;margin-top:28px}
+		.hero-left{flex:1}
+		.hero-ctas{margin-top:18px;display:flex;gap:12px}
+		.btn{background:var(--accent);color:white;padding:12px 18px;border-radius:12px;border:0;cursor:pointer;font-weight:700}
+		.btn.ghost{background:transparent;color:var(--accent);border:2px solid rgba(0,0,0,0.06)}
+
+		.hero-right{width:320px;display:flex;align-items:center;justify-content:center}
+		.card-art{width:100%;max-width:320px}
+
+		.features{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:28px}
+		.feature{background:white;padding:16px;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.04);text-align:center}
+		.feature h3{margin:8px 0}
+
+		footer{margin-top:32px;text-align:center;color:var(--muted);font-size:0.95rem}
+
+		@media (max-width:880px){.hero{flex-direction:column-reverse}.hero-right{width:220px}}
+
+		/* inline logo style (four-petal pastel icon) */
+		.logo-svg{width:64px;height:64px}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<nav class="nav">
+			<div class="brand">
+				<!-- Inline SVG inspired by provided logo -->
+				<svg class="logo-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+					<defs>
+						<radialGradient id="g1" cx="50%" cy="40%" r="60%">
+							<stop offset="0%" stop-color="#ffd9e7" />
+							<stop offset="100%" stop-color="#ffb7d6" />
+						</radialGradient>
+						<radialGradient id="g2" cx="50%" cy="40%" r="60%">
+							<stop offset="0%" stop-color="#ffe7f2" />
+							<stop offset="100%" stop-color="#ffb0e0" />
+						</radialGradient>
+					</defs>
+					<rect width="120" height="120" rx="20" fill="#fff5f8"/>
+					<g transform="translate(10,10)">
+						<circle cx="30" cy="30" r="26" fill="url(#g1)"/>
+						<circle cx="90" cy="30" r="26" fill="url(#g2)"/>
+						<circle cx="30" cy="90" r="26" fill="#ffb6c9"/>
+						<circle cx="90" cy="90" r="26" fill="#ffa3d1"/>
+						<g fill="#fff" transform="translate(6,6)">
+							<path d="M24 18c0 3-4 6-6 6s-6-3-6-6 2.7-7 6-7 6 4 6 7z" />
+							<path d="M84 18l-6 6-6-6 6-6z" transform="translate(-12,0) rotate(15 78 18)" />
+							<circle cx="36" cy="88" r="8" />
+							<g transform="translate(72,80)"><circle cx="0" cy="0" r="8"/></g>
+						</g>
+					</g>
+				</svg>
+				<div>
+					<div style="font-weight:800">Pasterflow</div>
+					<div style="font-size:0.85rem;color:var(--muted)">Pastel temalı hafıza oyunu</div>
+				</div>
+			</div>
+			<div>
+				<a class="btn ghost" href="privacy.html">Gizlilik</a>
+			</div>
+		</nav>
+
+		<section class="hero">
+			<div class="hero-left">
+				<h1>Renkli, yumuşak ve rahatlatıcı bir hafıza deneyimi</h1>
+				<p class="lead">Pasterflow ile hafızanızı eğlenceli pastel kartlarla test edin. Kısa molalarda oynanmak üzere tasarlandı — hızlı, sevimli ve rahatlatıcı.</p>
+				<div class="hero-ctas">
+					<a class="btn" href="game.html">Hemen Oyna</a>
+					<a class="btn ghost" href="#how">Nasıl Oynanır</a>
+				</div>
+			</div>
+
+			<div class="hero-right">
+				<!-- Decorative card art that echoes the logo -->
+				<svg class="card-art" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Pasterflow logo art">
+					<rect width="240" height="240" rx="22" fill="#fff5f8"/>
+					<g transform="translate(20,20)">
+						<circle cx="60" cy="60" r="48" fill="#ffd9e7"/>
+						<circle cx="180" cy="60" r="48" fill="#ffb7d6"/>
+						<circle cx="60" cy="180" r="48" fill="#ffb6c9"/>
+						<circle cx="180" cy="180" r="48" fill="#ffa3d1"/>
+						<g fill="#fff" transform="translate(12,12)">
+							<path d="M48 36c0 6-8 12-12 12s-12-6-12-12 5.4-14 12-14 12 8 12 14z"/>
+							<path d="M168 36l-12 12-12-12 12-12z" transform="rotate(12 156 36)"/>
+							<circle cx="72" cy="180" r="14" />
+							<path d="M180 176a14 14 0 1 0 0.001 0z"/>
+						</g>
+					</g>
+				</svg>
+			</div>
+		</section>
+
+		<section id="how" style="margin-top:28px">
+			<h2>Nasıl Oynanır</h2>
+			<div style="color:var(--muted);margin-top:8px;max-width:760px">Kartları çevirin ve eşleşen ikiliyi bulun. Tüm çiftleri bulduğunuzda tur tamamlanır. Skorunuzu hareket sayısı ve geçen süre belirler — daha az hamle daha iyi skor demektir.</div>
+		</section>
+
+		<section class="features" aria-hidden="false">
+			<div class="feature">
+				<strong>Hızlı Oyna</strong>
+				<div style="color:var(--muted);margin-top:8px">Her tur birkaç dakikanızı alır — molalar için ideal.</div>
+			</div>
+			<div class="feature">
+				<strong>Sevimli Tasarım</strong>
+				<div style="color:var(--muted);margin-top:8px">Pastel tonlar rahatlatıcı bir oyun deneyimi sunar.</div>
+			</div>
+			<div class="feature">
+				<strong>Her Yaşa Uygun</strong>
+				<div style="color:var(--muted);margin-top:8px">Basit kurallar ve erişilebilir kontroller.</div>
+			</div>
+		</section>
+
+		<footer>
+			Pasterflow — Eğlenceli hafıza oyunu • Daha fazlası için <a href="game.html">oyna</a> veya <a href="privacy.html">gizlilik politikasını</a> inceleyin.
+		</footer>
+	</div>
+</body>
+</html>
+
